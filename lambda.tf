@@ -28,6 +28,10 @@ resource "aws_lambda_function" "zoom_recording_save" {
   memory_size = 10240
 }
 
+resource "aws_cloudwatch_log_group" "zoom_recording_save_log_group" {
+  name              = "/aws/lambda/zoom_recording_save"
+}
+
 resource "aws_lambda_function" "zoom_recording_transcribe" {
   function_name = "zoom_recording_transcribe"
 
@@ -40,6 +44,10 @@ resource "aws_lambda_function" "zoom_recording_transcribe" {
   memory_size = 10240
 }
 
+resource "aws_cloudwatch_log_group" "zoom_recording_transcribe_log_group" {
+  name              = "/aws/lambda/zoom_recording_transcribe"
+}
+
 resource "aws_lambda_function" "zoom_recording_transcribed_text_alert" {
   function_name = "zoom_recording_transcribed_text_alert"
 
@@ -50,6 +58,30 @@ resource "aws_lambda_function" "zoom_recording_transcribed_text_alert" {
   runtime     = "ruby2.7"
   timeout     = 60
   memory_size = 10240
+}
+
+resource "aws_cloudwatch_log_group" "zoom_recording_transcribed_text_alert_log_group" {
+  name              = "/aws/lambda/zoom_recording_transcribed_text_alert"
+}
+
+resource "aws_iam_role_policy" "zoom_recording_save_role_policy" {
+  name = "zoom_recording_save_role_policy"
+  role = aws_iam_role.zoom_recording_save_role.id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "s3:FullAccess",
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents",
+        ]
+        Effect   = "Allow"
+        Resource = "*"
+      },
+    ]
+  })
 }
 
 resource "aws_iam_role" "zoom_recording_save_role" {
@@ -71,6 +103,27 @@ resource "aws_iam_role" "zoom_recording_save_role" {
 POLICY
 }
 
+resource "aws_iam_role_policy" "zoom_recording_transcribe_role_policy" {
+  name = "zoom_recording_transcribe_role_policy"
+  role = aws_iam_role.zoom_recording_transcribe_role.id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "transcribe:FullAccess",
+          "s3:FullAccess",
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents",
+        ]
+        Effect   = "Allow"
+        Resource = "*"
+      },
+    ]
+  })
+}
+
 resource "aws_iam_role" "zoom_recording_transcribe_role" {
   name               = "zoom_recording_transcribe_role"
   path               = "/service-role/"
@@ -88,6 +141,27 @@ resource "aws_iam_role" "zoom_recording_transcribe_role" {
   ]
 }
 POLICY
+}
+
+resource "aws_iam_role_policy" "zoom_recording_transcribed_text_alert_role_policy" {
+  name = "zoom_recording_transcribed_text_alert_role_policy"
+  role = aws_iam_role.zoom_recording_transcribed_text_alert_role.id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "transcribe:FullAccess",
+          "s3:FullAccess",
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents",
+        ]
+        Effect   = "Allow"
+        Resource = "*"
+      },
+    ]
+  })
 }
 
 resource "aws_iam_role" "zoom_recording_transcribed_text_alert_role" {
