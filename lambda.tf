@@ -46,8 +46,12 @@ resource "aws_iam_role_policy" "zoom_recording_save_role_policy" {
     Version = "2012-10-17"
     Statement = [
       {
+        "Effect": "Allow",
+        "Action": "s3:*",
+        "Resource": "*"
+      },
+      {
         Action = [
-          "s3:FullAccess",
           "logs:CreateLogGroup",
           "logs:CreateLogStream",
           "logs:PutLogEvents",
@@ -88,9 +92,17 @@ resource "aws_iam_role_policy" "zoom_recording_transcribe_role_policy" {
     Version = "2012-10-17"
     Statement = [
       {
+        "Effect": "Allow",
+        "Action": "s3:*",
+        "Resource": "*"
+      },
+      {
+        "Effect": "Allow",
+        "Action": "transcribe:*",
+        "Resource": "*"
+      },
+      {
         Action = [
-          "transcribe:FullAccess",
-          "s3:FullAccess",
           "logs:CreateLogGroup",
           "logs:CreateLogStream",
           "logs:PutLogEvents",
@@ -145,9 +157,12 @@ resource "aws_iam_role_policy" "zoom_recording_transcribed_text_alert_role_polic
     Version = "2012-10-17"
     Statement = [
       {
+        "Effect": "Allow",
+        "Action": "s3:*",
+        "Resource": "*"
+      },
+      {
         Action = [
-          "transcribe:FullAccess",
-          "s3:FullAccess",
           "logs:CreateLogGroup",
           "logs:CreateLogStream",
           "logs:PutLogEvents",
