@@ -26,12 +26,14 @@ resource "aws_s3_bucket_notification" "bucket_notification" {
     lambda_function_arn     = aws_lambda_function.zoom_recording_transcribe.arn
     events        = ["s3:ObjectCreated:*"]
     filter_prefix = "recording/"
+    filter_suffix = ".mp4"
   }
 
   lambda_function {
     lambda_function_arn     = aws_lambda_function.zoom_recording_transcribed_text_alert.arn
     events        = ["s3:ObjectCreated:*"]
     filter_prefix = "text/"
+    filter_suffix = ".txt"
   }
 
   depends_on = [
